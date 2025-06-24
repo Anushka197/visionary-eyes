@@ -3,10 +3,10 @@ import numpy as np
 from ultralytics import YOLO
 
 # Load your trained YOLOv11 model
-model = YOLO("best.pt")  # Replace with your model path
+model = YOLO("../best.pt")  # Replace with your model path
 
 # Initialize video capture
-cap = cv2.VideoCapture("15sec_input_720p.mp4")  # Or use 0 for webcam
+cap = cv2.VideoCapture("../15sec_input_720p.mp4")  # Or use 0 for webcam
 
 # Store tracked players
 player_id_counter = 0
