@@ -1,0 +1,30 @@
+{
+  "video": {
+    "input_path": "D:\\AnushkaData\\internship_liat\\practice3\\15sec_input_720p.mp4",
+    "output_path": "D:\\AnushkaData\\internship_liat\\practice3\\output_detected.mp4",
+    "frame_rate": null,
+    "resolution": {
+      "width": null,
+      "height": null
+    },
+    "display_output": true,
+    "save_results": true
+  },
+
+  "detection": {
+    "enabled": true,
+    "model": {
+      "name": "yolov5s",
+      "weights_path": null,
+      "confidence_threshold": 0.4,
+      "iou_threshold": 0.5
+    },
+    "classes_to_detect": ["person"],
+    "visual": {
+      "draw_box_color": [0, 255, 0],
+      "font_scale": 0.5,
+      "font_thickness": 1,
+      "label_prefix": "Player"
+    }
+  }
+}
