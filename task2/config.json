@@ -1,11 +1,11 @@
 {
   "video": {
     "input_path": "D:\\AnushkaData\\internship_liat\\practice3\\15sec_input_720p.mp4",
-    "output_path": "D:\\AnushkaData\\internship_liat\\practice3\\output_detected.mp4",
-    "frame_rate": null,
+    "output_path": "D:\\AnushkaData\\internship_liat\\practice3\\output_tracking.mp4",
+    "frame_rate": 25,
     "resolution": {
-      "width": null,
-      "height": null
+      "width": "1280px",
+      "height": "720px"
     },
     "display_output": true,
     "save_results": true
