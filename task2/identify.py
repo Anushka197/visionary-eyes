@@ -32,9 +32,9 @@ model.iou = iou_thresh
 
 # === Initialize Deep SORT Tracker ===
 tracker = DeepSort(
-    max_age=60,                 # Keep IDs alive longer
-    n_init=3,
-    max_cosine_distance=0.3,   # Feature similarity threshold
+    max_age=3,                 # Keep IDs alive longer
+    n_init=1,
+    max_cosine_distance=0.5,   # Feature similarity threshold
     nn_budget=100,             # Store recent embeddings
     override_track_class=None,
     embedder="mobilenet",      # CPU-friendly
@@ -79,7 +79,7 @@ def process_frame(frame):
             cropped = frame[y1:y2, x1:x2]
 
             # Ensure crop is non-empty and big enough for ReID
-            if cropped.size == 0 or cropped.shape[0] < 20 or cropped.shape[1] < 20:
+            if cropped.size == 0 or cropped.shape[0] < 10 or cropped.shape[1] < 10:
                 continue
 
             # Resize for standard ReID embedding size
@@ -105,9 +105,6 @@ def process_frame(frame):
         cv2.rectangle(frame, (x1, y1), (x2, y2), draw_color, 2)
         cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
                     font_scale, draw_color, font_thickness)
-        
-        # Optional debug log
-        # print(f"Track {track_id} | Age: {track.age} | Hits: {track.hits}")
 
     return frame
 

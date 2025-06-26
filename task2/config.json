@@ -1,11 +1,11 @@
 {
   "video": {
     "input_path": "D:\\AnushkaData\\internship_liat\\practice3\\15sec_input_720p.mp4",
-    "output_path": "D:\\AnushkaData\\internship_liat\\practice3\\output_tracking.mp4",
+    "output_path": "D:\\AnushkaData\\internship_liat\\practice3\\tracking.mp4",
     "frame_rate": 25,
     "resolution": {
-      "width": "1280px",
-      "height": "720px"
+      "width": 1280,
+      "height": 720
     },
     "display_output": true,
     "save_results": true
@@ -17,9 +17,9 @@
       "name": "yolov5s",
       "weights_path": null,
       "confidence_threshold": 0.4,
-      "iou_threshold": 0.5
+      "iou_threshold": 0.2
     },
-    "classes_to_detect": ["person"],
+    "classes_to_detect": ["person"], 
     "visual": {
       "draw_box_color": [0, 255, 0],
       "font_scale": 0.5,
