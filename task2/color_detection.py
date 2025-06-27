@@ -1,9 +1,12 @@
 import torch
 import cv2
 import json
-from deep_sort_realtime.deepsort_tracker import DeepSort
 import os
+import numpy as np
+from sklearn.cluster import KMeans
+from deep_sort_realtime.deepsort_tracker import DeepSort
 
+# === Create debug directory ===
 os.makedirs("debug_crops", exist_ok=True)
 
 # === Load config ===
@@ -33,9 +36,9 @@ model.iou = iou_thresh
 
 # === Initialize Deep SORT Tracker ===
 tracker = DeepSort(
-    max_age=10,                 # IDs stay longer
-    n_init=1,                   # More stable
-    max_cosine_distance=0.3,
+    max_age=10,
+    n_init=1,
+    max_cosine_distance=0.5,
     nn_budget=100,
     override_track_class=None,
     embedder="mobilenet",
@@ -62,6 +65,17 @@ out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 id_map = {}
 next_id = 0
 
+# === Function: Get dominant jersey color ===
+def get_dominant_color(image, k=1):
+    try:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = image.reshape((-1, 3))
+        clt = KMeans(n_clusters=k, n_init=10)
+        clt.fit(image)
+        return tuple(map(int, clt.cluster_centers_[0]))  # RGB
+    except:
+        return (127, 127, 127)
+
 # === Frame processing ===
 def process_frame(frame):
     global id_map, next_id
@@ -85,8 +99,18 @@ def process_frame(frame):
             if cropped.size == 0 or cropped.shape[0] < 10 or cropped.shape[1] < 10:
                 continue
 
+            # === Resize full body crop ===
             cropped_resized = cv2.resize(cropped, (128, 256))
-            track_inputs.append(([x1, y1, w, h], conf.item(), cropped_resized))
+
+            # === Extract jersey region (upper half) ===
+            jersey_roi = cropped[0:int(cropped.shape[0] * 0.5), :]
+            jersey_color = get_dominant_color(jersey_roi)
+
+            # === Create a vertical color bar (BGR) and attach to the crop ===
+            color_patch = np.full((256, 32, 3), jersey_color[::-1], dtype=np.uint8)
+            combined_image = np.hstack([cropped_resized, cv2.resize(color_patch, (32, 256))])
+
+            track_inputs.append(([x1, y1, w, h], conf.item(), combined_image))
 
     if len(track_inputs) == 0:
         return frame
@@ -113,7 +137,7 @@ def process_frame(frame):
 
     return frame
 
-# === Main processing loop ===
+# === Main loop ===
 frame_id = 0
 while cap.isOpened():
     ret, frame = cap.read()
