@@ -3,6 +3,7 @@ import cv2
 import json
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import os
+
 os.makedirs("debug_crops", exist_ok=True)
 
 # === Load config ===
@@ -32,12 +33,12 @@ model.iou = iou_thresh
 
 # === Initialize Deep SORT Tracker ===
 tracker = DeepSort(
-    max_age=3,                 # Keep IDs alive longer
-    n_init=1,
-    max_cosine_distance=0.5,   # Feature similarity threshold
-    nn_budget=100,             # Store recent embeddings
+    max_age=10,                 # IDs stay longer
+    n_init=1,                   # More stable
+    max_cosine_distance=0.3,
+    nn_budget=100,
     override_track_class=None,
-    embedder="mobilenet",      # CPU-friendly
+    embedder="mobilenet",
     half=True,
     bgr=True,
 )
@@ -57,11 +58,16 @@ if config["video"]["resolution"]["width"] is None:
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
+# === Track ID remapping ===
+id_map = {}
+next_id = 0
+
 # === Frame processing ===
 def process_frame(frame):
+    global id_map, next_id
+
     results = model(frame)
     detections = results.xyxy[0]
-
     track_inputs = []
 
     for *box, conf, cls in detections:
@@ -72,20 +78,14 @@ def process_frame(frame):
             x1, y1, x2, y2 = map(int, box)
             w, h = x2 - x1, y2 - y1
 
-            # Skip invalid boxes
             if x1 < 0 or y1 < 0 or x2 > frame.shape[1] or y2 > frame.shape[0]:
                 continue
 
             cropped = frame[y1:y2, x1:x2]
-
-            # Ensure crop is non-empty and big enough for ReID
             if cropped.size == 0 or cropped.shape[0] < 10 or cropped.shape[1] < 10:
                 continue
 
-            # Resize for standard ReID embedding size
             cropped_resized = cv2.resize(cropped, (128, 256))
-            # cv2.imwrite(f"debug_crops/frame{frame_id}_x{x1}_{y1}_{x2}_{y2}.jpg", cropped_resized)
-
             track_inputs.append(([x1, y1, w, h], conf.item(), cropped_resized))
 
     if len(track_inputs) == 0:
@@ -97,19 +97,24 @@ def process_frame(frame):
         if not track.is_confirmed():
             continue
 
-        track_id = track.track_id
+        raw_id = track.track_id
+        if raw_id not in id_map:
+            id_map[raw_id] = next_id
+            next_id += 1
+
+        assigned_id = id_map[raw_id]
         ltrb = track.to_ltrb()
         x1, y1, x2, y2 = map(int, ltrb)
 
-        label = f"{label_prefix} {track_id}"
+        label = f"{label_prefix} {assigned_id}"
         cv2.rectangle(frame, (x1, y1), (x2, y2), draw_color, 2)
         cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
                     font_scale, draw_color, font_thickness)
 
     return frame
 
+# === Main processing loop ===
 frame_id = 0
-# === Main processing loop (no threads for consistency) ===
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -119,11 +124,11 @@ while cap.isOpened():
     out.write(processed)
 
     if display_output:
-        cv2.imshow("Tracking", processed)
+        resized = cv2.resize(processed, (960, 540))
+        cv2.imshow("Tracking", resized)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     frame_id += 1
-
 
 cap.release()
 out.release()
