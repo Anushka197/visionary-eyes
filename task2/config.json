@@ -1,7 +1,5 @@
 {
   "video": {
-    "input_path": "D:\\AnushkaData\\internship_liat\\practice3\\upscaled_video.mp4",
-    "output_path": "D:\\AnushkaData\\internship_liat\\practice3\\identifying.mp4",
     "frame_rate": 25,
     "resolution": {
       "width": 1280,

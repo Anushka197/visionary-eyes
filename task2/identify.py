@@ -11,8 +11,8 @@ with open('config.json', 'r') as f:
     config = json.load(f)
 
 # === Extract values ===
-video_path = config["video"]["input_path"]
-output_path = config["video"]["output_path"]
+video_path = "..\\resources\\15sec_input_720p.mp4"
+output_path = ".\\output\\identify.mp4"
 display_output = config["video"]["display_output"]
 save_results = config["video"]["save_results"]
 

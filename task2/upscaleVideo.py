@@ -1,7 +1,7 @@
 import cv2
 
-input_path = 'D:\\AnushkaData\\internship_liat\\practice3\\15sec_input_720p.mp4'
-output_path = 'upscaled_video.mp4'
+input_path = '..\\resources\\15sec_input_720p.mp4'
+output_path = '.\\output\\upscaled_video.mp4'
 
 cap = cv2.VideoCapture(input_path)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) * 2)

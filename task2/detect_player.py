@@ -14,8 +14,8 @@ detection_config = config["detection"]
 model_config = detection_config["model"]
 visual_config = detection_config["visual"]
 
-video_path = video_config["input_path"]
-output_path = video_config["output_path"]
+video_path = "..\\resources\\15sec_input_720p.mp4"
+output_path = ".\\output\\detection.mp4"
 display_output = video_config["display_output"]
 save_results = video_config["save_results"]
 
@@ -49,6 +49,7 @@ if video_config["resolution"]["width"] is None:
 
 # === Prepare video writer ===
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+print(f"FPS: {fps}, Width: {width}, Height: {height}, Opened: {cap.isOpened()}")
 out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
 # === Thread-safe detection function ===
@@ -75,7 +76,7 @@ futures = []
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
-        break
+        print("⚠️ Could not read video file — check the path or codec.")
 
     # Submit frame for threaded processing
     future = executor.submit(process_frame, frame)
