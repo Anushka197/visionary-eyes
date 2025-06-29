@@ -78,7 +78,7 @@ pip install -r requirements.txt
 
 4. Place your model weights:
    - yolov8 model in `task2/`
-   - Custom model (``best.pt`) in `resources/`
+   - Custom model (`best.pt`) in `resources/`
 
 ---
 
