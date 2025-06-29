@@ -1,59 +1,41 @@
 from ultralytics import YOLO
-import pandas as pd
-import os
+import cv2
 
-# === Load model and track
+# Load model
 model = YOLO("..\\resources\\best.pt")
 
+# Run tracking (but don’t show/save automatically)
 results = model.track(
     source="..\\resources\\15sec_input_720p.mp4",
     persist=True,
-    conf=0.4,
+    conf=0.8,
     iou=0.5,
-    save=True
+    stream=True  # <== IMPORTANT: stream frames so you can manually process
 )
 
-# === Prepare to save data
-all_data = []
+# Open video writer (optional)
+out = cv2.VideoWriter(".\\output\\output_1.avi", cv2.VideoWriter_fourcc(*'XVID'), 25, (1280, 720))
 
-# === Extract frame-wise tracking data
-for r in results:
-    frame_num = r.path.split("frame")[-1].split(".")[0] if "frame" in r.path else "?"
-    if r.boxes is None:
-        continue
-    for box in r.boxes:
-        cls = int(box.cls[0])
-        conf = float(box.conf[0])
-        track_id = int(box.id[0]) if box.id is not None else -1
-        x1, y1, x2, y2 = map(int, box.xyxy[0])
-        class_name = model.names.get(cls, f"class_{cls}")
-        all_data.append({
-            "frame": int(frame_num) if frame_num != "?" else -1,
-            "id": track_id,
-            "class": class_name,
-            "conf": round(conf, 3),
-            "x1": x1, "y1": y1, "x2": x2, "y2": y2
-        })
+# Iterate over each frame result
+for result in results:
+    frame = result.orig_img  # original frame
 
-# === Create DataFrame and save
-df = pd.DataFrame(all_data)
-csv_path = "..\\output\\id_stats.csv"
-df.to_csv(csv_path, index=False)
-print(f"\nTracking data saved to: {csv_path}")
+    if result.boxes is not None:
+        boxes = result.boxes.xyxy.cpu().numpy()  # x1, y1, x2, y2
+        ids = result.boxes.id.cpu().numpy() if result.boxes.id is not None else None
+        confs = result.boxes.conf.cpu().numpy()
+        classes = result.boxes.cls.cpu().numpy()
 
-# === Analyze
-print("\nOBJECT COUNT PER CLASS:")
-print(df['class'].value_counts())
+        for i, box in enumerate(boxes):
+            x1, y1, x2, y2 = map(int, box)
+            id_text = f"ID: {int(ids[i])}" if ids is not None else ""
+            class_id = int(classes[i])
+            label = f"{id_text}"
 
-print("\nAVERAGE CONFIDENCE PER CLASS:")
-print(df.groupby('class')['conf'].mean().round(3))
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-print("\nFRAME COUNT PER OBJECT ID:")
-print(df.groupby('id')['frame'].count().sort_values(ascending=False).head(10))
+    # Show or write frame
+    out.write(frame)  # or use cv2.imshow("Custom", frame) if you want to see it live
 
-# === BONUS: Movement range per ID
-print("\nMOVEMENT RANGE PER OBJECT ID (X range):")
-df['x_center'] = (df['x1'] + df['x2']) / 2
-x_range = df.groupby('id')['x_center'].agg(['min', 'max'])
-x_range['range'] = (x_range['max'] - x_range['min']).round(1)
-print(x_range[['range']].sort_values(by='range', ascending=False).head(10))
+out.release()
