@@ -30,7 +30,7 @@ This is an experimental project — not production-ready. The aim is to prototyp
 - Partial handling of occlusions and re-identification
 - Customizable confidence and IoU thresholds
 - Support for video file input
-- Separate pipelines for testing different models (custom vs YOLOv8)
+- Separate pipelines for testing different models (custom vs YOLOv5)
 
 ---
 
@@ -57,7 +57,7 @@ Optional:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/visionary-eyes.git
+git clone https://github.com/Anushka197/visionary-eyes/
 cd visionary-eyes
 ```
 
@@ -66,7 +66,7 @@ cd visionary-eyes
 ```bash
 python -m venv cv_env
 cv_env\Scripts\activate       # Windows
-# or
+          OR
 source cv_env/bin/activate    # macOS/Linux
 ```
 
@@ -77,7 +77,7 @@ pip install -r requirements.txt
 ```
 
 4. Place your model weights:
-   - yolov8 model in `task2/`
+   - yolov5 model in `task2/`
    - Custom model (`best.pt`) in `resources/`
 
 ---
@@ -97,18 +97,18 @@ visionary-eyes/
 │   ├── output/                   # Output videos/images
 │   └── yolov5/                   # YOLOv5 repo (submodule or clone)
 │
-├── original_task2/              # YOLOv8 pipeline using Ultralytics
+├── original_task2/               # YOLOv5 pipeline using Ultralytics
 │   ├── config.json               # Separate config file
-│   ├── detection.py              # YOLOv8 detection
-│   ├── identification.py        # Basic ID assignment
-│   ├── test_model.py            # Model performance check
-│   ├── model_inspection.py      # Analyze layers/params
-│   ├── model_info.txt           # Notes/stats
+│   ├── detection.py              # YOLOv5 detection
+│   ├── identification.py         # Basic ID assignment
+│   ├── test_model.py             # Model performance check
+│   ├── model_inspection.py       # Analyze layers/params
+│   ├── model_info.txt            # Notes/stats
 │   ├── output/                   # Output for this task
-│   ├── runs/                     # YOLOv8 experiment logs
-│   └── detection_conf_iou.py    # Threshold tuning
+│   ├── runs/                     # YOLOv5 experiment logs
+│   └── detection_conf_iou.py     # Threshold tuning
 │
-├── resources/                   # Common resources, videos and best.pt
+├── resources/                    # Common resources, videos and best.pt
 ├── LICENSE
 ├── README.md
 └── requirements.txt
@@ -131,7 +131,7 @@ Modify `task2/config.json` to change video path, confidence, output directory, e
 
 ```bash
 cd original_task2
-python identification.py
+python custom_id.py
 ```
 
 Edit `original_task2/config.json` to set detection parameters and input sources.
