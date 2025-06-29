@@ -5,9 +5,11 @@ import os
 import numpy as np
 from sklearn.cluster import KMeans
 from deep_sort_realtime.deepsort_tracker import DeepSort
+import csv
 
-# === Create debug directory ===
+# === Create output directories ===
 os.makedirs("debug_crops", exist_ok=True)
+os.makedirs("output", exist_ok=True)
 
 # === Load config ===
 with open('config.json', 'r') as f:
@@ -16,6 +18,7 @@ with open('config.json', 'r') as f:
 # === Extract values ===
 video_path = "..\\resources\\15sec_input_720p.mp4"
 output_path = ".\\output\\clrIdentify.mp4"
+csv_path = ".\\output\\clrIdentify.csv"
 display_output = config["video"]["display_output"]
 save_results = config["video"]["save_results"]
 
@@ -38,7 +41,7 @@ model.iou = iou_thresh
 tracker = DeepSort(
     max_age=10,
     n_init=1,
-    max_cosine_distance=0.5,
+    max_cosine_distance=0.3,
     nn_budget=100,
     override_track_class=None,
     embedder="mobilenet",
@@ -61,6 +64,11 @@ if config["video"]["resolution"]["width"] is None:
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
+# === CSV logging setup ===
+csv_file = open(csv_path, mode='w', newline='')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(["frame_id", "id", "x1", "y1", "x2", "y2"])
+
 # === Track ID remapping ===
 id_map = {}
 next_id = 0
@@ -77,7 +85,7 @@ def get_dominant_color(image, k=1):
         return (127, 127, 127)
 
 # === Frame processing ===
-def process_frame(frame):
+def process_frame(frame, frame_id):
     global id_map, next_id
 
     results = model(frame)
@@ -135,6 +143,9 @@ def process_frame(frame):
         cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
                     font_scale, draw_color, font_thickness)
 
+        # === Write to CSV ===
+        csv_writer.writerow([frame_id, assigned_id, x1, y1, x2, y2])
+
     return frame
 
 # === Main loop ===
@@ -144,7 +155,7 @@ while cap.isOpened():
     if not ret:
         break
 
-    processed = process_frame(frame)
+    processed = process_frame(frame, frame_id)
     out.write(processed)
 
     if display_output:
@@ -153,6 +164,8 @@ while cap.isOpened():
             break
     frame_id += 1
 
+# === Cleanup ===
 cap.release()
 out.release()
+csv_file.close()
 cv2.destroyAllWindows()
