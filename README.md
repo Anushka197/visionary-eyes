@@ -165,13 +165,11 @@ Includes:
 
 Compares the detection **confidence trends** across three different tracker outputs:
 - YOLOv5 (`identify.csv`)
-- Color+OCR enhanced tracker (`clrIdentify.csv`)
+- Color enhanced tracker (`clrIdentify.csv`)
 - Manual ID tracker (`manual_id_output.csv`)
 
 Includes:
-- Frame-wise average confidence plots
-- Visual line chart for intuitive comparison
-- Mean confidence scores per tracker
+- Average confidence per frame
 
 Useful for evaluating **which tracker is most confident**, consistent, or potentially overfitting — even without ground truth labels.
 
