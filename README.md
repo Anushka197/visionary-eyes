@@ -159,11 +159,12 @@ Use this notebook to visually and numerically compare detection results between:
 Includes:
 - Frame-by-frame comparison
 - Detection counts per frame
-- Visual side-by-side plots
+- Visual plots
 
 #### `id_compare.ipynb`
 
-Focuses on analyzing ID assignment consistency.
+      Focuses on analyzing ID assignment consistency.
+      
 ---
 ## License
 
