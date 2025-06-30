@@ -126,7 +126,7 @@ python identify.py
 
 Modify `task2/config.json` to change video path, confidence, output directory, etc.
 
-### Run YOLOv8-based detection (`original_task2`):
+### Run best.pt-based detection (`original_task2`):
 
 ```bash
 cd original_task2
