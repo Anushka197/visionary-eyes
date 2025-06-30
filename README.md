@@ -107,6 +107,8 @@ visionary-eyes/
 │   ├── runs/                     # experiment logs
 │   └── detection_conf_iou.py     # Threshold tuning
 │
+├── detection_comparison.ipynb    # Compares detection results of different models
+├── id_compare.ipynb              # Compares tracking consistency (ID assignment)
 ├── resources/                    # Common resources, videos and best.pt
 ├── LICENSE
 ├── README.md
@@ -146,7 +148,23 @@ Each frame contains:
 - Player ID
 
 ---
+### Evaluate & Compare Outputs:
 
+#### `detection_comparison.ipynb`
+
+Use this notebook to visually and numerically compare detection results between:
+- YOLOv5 (`task2`)
+- best.pt model (`original_task2`)
+
+Includes:
+- Frame-by-frame comparison
+- Detection counts per frame
+- Visual side-by-side plots
+
+#### `id_compare.ipynb`
+
+Focuses on analyzing ID assignment consistency.
+---
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
