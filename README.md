@@ -25,12 +25,12 @@ This is an experimental project — not production-ready. The aim is to prototyp
 
 ## Features
 
-- Player detection using YOLOv5 and custom model pretrained on yolov11
+- Player detection using YOLOv5 and custom model fine-tuned on yolov11
 - Attempts at consistent player ID assignment across frames
 - Partial handling of occlusions and re-identification
 - Customizable confidence and IoU thresholds
 - Support for video file input
-- Separate pipelines for testing different models (custom vs YOLOv5)
+- Separate pipelines for testing different models (best.pt vs YOLOv5)
 
 ---
 
@@ -87,25 +87,24 @@ pip install -r requirements.txt
 ```
 visionary-eyes/
 │
-├── task2/                        # YOLOv5 pipeline (with Deep-Person-ReID optional)
+├── task2/                        # YOLOv5
 │   ├── yolov5s.pt                # Trained model
 │   ├── config.json               # Configuration for this task
 │   ├── detect_player.py          # Player detection logic
 │   ├── identify.py               # Tracking + ID assignment
 │   ├── color_detection.py        # Color clustering (optional)
-│   ├── debug_crops/              # For visual debugging
 │   ├── output/                   # Output videos/images
-│   └── yolov5/                   # YOLOv5 repo (submodule or clone)
+│   └── yolov5/                   # YOLOv5 repo (submodule)
 │
-├── original_task2/               # YOLOv5 pipeline using Ultralytics
+├── original_task2/               # best.py
 │   ├── config.json               # Separate config file
-│   ├── detection.py              # YOLOv5 detection
+│   ├── detection.py              # detection
 │   ├── identification.py         # Basic ID assignment
-│   ├── test_model.py             # Model performance check
-│   ├── model_inspection.py       # Analyze layers/params
-│   ├── model_info.txt            # Notes/stats
+│   ├── test_model.py             # Model features check
+│   ├── model_inspection.py       # Analyze model (layers/params)
+│   ├── model_info.txt            # output from model_inspection.py
 │   ├── output/                   # Output for this task
-│   ├── runs/                     # YOLOv5 experiment logs
+│   ├── runs/                     # experiment logs
 │   └── detection_conf_iou.py     # Threshold tuning
 │
 ├── resources/                    # Common resources, videos and best.pt

@@ -3,8 +3,12 @@ import cv2
 import json
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import os
+import csv
 
-os.makedirs("debug_crops", exist_ok=True)
+csv_path = ".\\output\\identify.csv"
+csv_file = open(csv_path, mode='w', newline='')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(["frame_id", "id", "x1", "y1", "x2", "y2", "confidence"])
 
 # === Load config ===
 with open('config.json', 'r') as f:
@@ -110,6 +114,18 @@ def process_frame(frame):
         cv2.rectangle(frame, (x1, y1), (x2, y2), draw_color, 2)
         cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
                     font_scale, draw_color, font_thickness)
+        
+        # === Find confidence for this track ===
+        matched_conf = None
+        for box, conf, img in track_inputs:
+            bx, by, bw, bh = box
+            if abs(x1 - bx) < 10 and abs(y1 - by) < 10:
+                matched_conf = conf
+                break
+
+        # === Log to CSV ===
+        csv_writer.writerow([frame_id, assigned_id, x1, y1, x2, y2, matched_conf if matched_conf else -1])
+
 
     return frame
 

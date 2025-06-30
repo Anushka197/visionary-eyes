@@ -67,7 +67,7 @@ out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 # === CSV logging setup ===
 csv_file = open(csv_path, mode='w', newline='')
 csv_writer = csv.writer(csv_file)
-csv_writer.writerow(["frame_id", "id", "x1", "y1", "x2", "y2"])
+csv_writer.writerow(["frame_id", "id", "x1", "y1", "x2", "y2", "confidence"])
 
 # === Track ID remapping ===
 id_map = {}
@@ -144,7 +144,16 @@ def process_frame(frame, frame_id):
                     font_scale, draw_color, font_thickness)
 
         # === Write to CSV ===
-        csv_writer.writerow([frame_id, assigned_id, x1, y1, x2, y2])
+        # === Find the original confidence for this box ===
+        matched_conf = None
+        for box, conf, img in track_inputs:
+            bx, by, bw, bh = box
+            if abs(x1 - bx) < 10 and abs(y1 - by) < 10:  # crude overlap match
+                matched_conf = conf
+                break
+
+        csv_writer.writerow([frame_id, assigned_id, x1, y1, x2, y2, matched_conf if matched_conf else -1])
+
 
     return frame
 
