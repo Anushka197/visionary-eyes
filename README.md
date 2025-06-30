@@ -163,8 +163,8 @@ Includes:
 
 #### `id_compare.ipynb`
 
-      Focuses on analyzing ID assignment consistency.
-      
+Focuses on analyzing ID assignment consistency.
+
 ---
 ## License
 
